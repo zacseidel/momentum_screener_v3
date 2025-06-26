@@ -167,91 +167,102 @@ momentum-screener/
 
 ## Entity-Relationship Diagram (ERD)
 ```mermaid
+erDiagram
+    index_membership {
+        TEXT ticker
+        TEXT index_name
+        TEXT sector
+        TEXT subindustry
+        REAL market_cap
+        REAL weight
+        TEXT last_updated
+    }
 
-index_membership {
-  TEXT ticker
-  TEXT index_name
-  TEXT sector
-  TEXT subindustry
-  REAL market_cap
-  REAL weight
-  TEXT last_updated
-}
+    price_history {
+        TEXT ticker
+        TEXT date
+        REAL open
+        REAL high
+        REAL low
+        REAL close
+        INTEGER volume
+    }
 
-price_history {
-  TEXT ticker
-  TEXT date
-  REAL open
-  REAL high
-  REAL low
-  REAL close
-  INTEGER volume
-}
+    momentum_snapshots {
+        TEXT date
+        TEXT ticker
+        REAL return_12m
+        INTEGER return_rank
+        TEXT source_universe
+    }
 
-momentum_snapshots {
-  TEXT date
-  TEXT ticker
-  REAL return_12m
-  INTEGER return_rank
-  TEXT source_universe
-}
+    features {
+        TEXT ticker
+        TEXT date
+        REAL pct_from_52w_high
+        REAL pct_from_52w_low
+        REAL slope_200d
+        BOOLEAN above_10d
+        BOOLEAN above_150d
+        BOOLEAN above_200d
+        INTEGER high_volume_days
+        REAL trend_strength
+    }
 
-features {
-  TEXT ticker
-  TEXT date
-  REAL pct_from_52w_high
-  REAL pct_from_52w_low
-  REAL slope_200d
-  BOOLEAN above_10d
-  BOOLEAN above_150d
-  BOOLEAN above_200d
-  INTEGER high_volume_days
-  REAL trend_strength
-}
+    ml_states {
+        TEXT ticker
+        TEXT date
+        INTEGER state_id
+        TEXT state_label
+    }
 
-ml_states {
-  TEXT ticker
-  TEXT date
-  INTEGER state_id
-  TEXT state_label
-}
+    forward_returns {
+        TEXT ticker
+        TEXT date
+        REAL return_1w
+        REAL excess_return_1w
+    }
 
-forward_returns {
-  TEXT ticker
-  TEXT date
-  REAL return_1w
-  REAL excess_return_1w
-}
+    company_metadata {
+        TEXT ticker
+        TEXT name
+        TEXT description
+        TEXT sector
+        TEXT subindustry
+    }
 
-company_metadata {
-  TEXT ticker
-  TEXT name
-  TEXT description
-  TEXT sector
-  TEXT subindustry
-}
+    news_articles {
+        TEXT ticker
+        TEXT date
+        TEXT headline
+        TEXT url
+        TEXT source
+        REAL sentiment_score
+    }
 
-news_articles {
-  TEXT ticker
-  TEXT date
-  TEXT headline
-  TEXT url
-  TEXT source
-  REAL sentiment_score
-}
+    watchlist {
+        TEXT ticker
+        TEXT tag
+        TEXT added_on
+    }
 
-watchlist {
-  TEXT ticker
-  TEXT tag
-  TEXT added_on
-}
+    decision_log {
+        TEXT ticker
+        TEXT date
+        TEXT action
+        TEXT notes
+    }
 
-decision_log {
-  TEXT ticker
-  TEXT date
-  TEXT action
-  TEXT notes
-}
+    %% One-to-many relationships (}o--||)
+    price_history      }o--|| company_metadata : belongs_to
+    momentum_snapshots }o--|| company_metadata : relates_to
+    features           }o--|| company_metadata : belongs_to
+    ml_states          }o--|| company_metadata : belongs_to
+    forward_returns    }o--|| company_metadata : belongs_to
+    news_articles      }o--|| company_metadata : references
+    watchlist          }o--|| company_metadata : tracks
+    decision_log       }o--|| company_metadata : logs
+    index_membership   }o--|| company_metadata : classifies
 ```
 
 ## Module Map & dependencies
@@ -301,7 +312,7 @@ def initialize_database():
     """Create all required tables if they do not exist."""
 
 ### sets/
-### scan_set.py
+#### scan_set.py
 def build_scan_set(as_of_date: str) -> set[str]:
     """Construct scan set from index tickers, watchlist, portfolio, prior reports."""
 
@@ -455,7 +466,7 @@ def run_pipeline(as_of_date: str):
 #### retrain_model.py
 def retrain_and_save():
     """Retrain the ML model on most recent features and outcomes."""
-    
+
 ##### backfill_data.py
 def backfill_historical_prices(start_year: int):
     """Pull old price history for all tickers as needed."""
