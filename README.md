@@ -253,16 +253,6 @@ erDiagram
         TEXT notes
     }
 
-    %% One-to-many relationships (}o--||)
-    price_history      }o--|| company_metadata : belongs_to
-    momentum_snapshots }o--|| company_metadata : relates_to
-    features           }o--|| company_metadata : belongs_to
-    ml_states          }o--|| company_metadata : belongs_to
-    forward_returns    }o--|| company_metadata : belongs_to
-    news_articles      }o--|| company_metadata : references
-    watchlist          }o--|| company_metadata : tracks
-    decision_log       }o--|| company_metadata : logs
-    index_membership   }o--|| company_metadata : classifies
 ```
 
 ## Module Map & dependencies
